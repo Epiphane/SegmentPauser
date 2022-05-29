@@ -63,31 +63,23 @@ namespace LiveSplit.UI.Components
             for (int i = 0; i < State.Run.Count; i++)
             {
                 ISegment currentSegment = State.Run[i];
-                if (!currentSegment.SegmentHistory.ContainsKey(previousAttempt))
+                if (currentSegment.PersonalBestSplitTime[State.CurrentTimingMethod] == null)
                 {
-                    // This split was not completed last segment.
+                    // This split has not been completed.
                     break;
                 }
 
-                Time lastAttempt = currentSegment.SegmentHistory[previousAttempt];
-                TimeSpan? lastTime = lastAttempt[State.CurrentTimingMethod];
-                if (lastTime == null)
-                {
-                    // This split has no recorded time.
-                    break;
-                }
-
-                simulatedTime[State.CurrentTimingMethod] += lastTime;
-                if (simulatedTime[State.CurrentTimingMethod] > State.Run.Offset)
+                simulatedTime += currentSegment.PersonalBestSplitTime;
+                if (currentSegment.PersonalBestSplitTime[State.CurrentTimingMethod] > State.Run.Offset)
                 {
                     // This is in the future!
                     break;
                 }
 
                 //timeRemaining = timeRemaining.Subtract((TimeSpan)lastTime);
-                currentSegment.SplitTime = simulatedTime;
+                currentSegment.SplitTime = currentSegment.PersonalBestSplitTime;
                 Timer.SkipSplit();
-                currentSegment.SplitTime = simulatedTime;
+                currentSegment.SplitTime = currentSegment.PersonalBestSplitTime;
             }
         }
 
